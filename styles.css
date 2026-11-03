@@ -1,0 +1,304 @@
+/*
+ * Respirá: estilos.
+ * Decisiones: tipografía del sistema (Verdana primero, muy legible y sin descargas, así funciona offline),
+ * botones de al menos 3,25 rem de alto, contraste AA o mejor, y un modo de alto contraste propio.
+ */
+
+/* ---------- Colores (tokens) ---------- */
+:root {
+  --bg: #f3f6f2;
+  --surface: #ffffff;
+  --fg: #16231f;
+  --muted: #3f524b;
+  --line: #c4d3cb;
+  --line-strong: #5b7066;
+  --accent: #1a6b58;
+  --accent-ink: #ffffff;
+  --focus: #9a3412;
+  --font: Verdana, "Segoe UI", system-ui, -apple-system, sans-serif;
+  --radius: 14px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0a1a1d;
+    --surface: #112a2f;
+    --fg: #e8f2ef;
+    --muted: #b1c8c2;
+    --line: #25454b;
+    --line-strong: #7fa39b;
+    --accent: #5fd3c0;
+    --accent-ink: #052421;
+    --focus: #fbbf24;
+  }
+}
+
+/* Alto contraste: se activa con el botón y pisa el tema del sistema. */
+:root[data-contrast="high"] {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --fg: #000000;
+  --muted: #000000;
+  --line: #000000;
+  --line-strong: #000000;
+  --accent: #00473a;
+  --accent-ink: #ffffff;
+  --focus: #b30000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-contrast="high"] {
+    --bg: #000000;
+    --surface: #000000;
+    --fg: #ffffff;
+    --muted: #ffffff;
+    --line: #ffffff;
+    --line-strong: #ffffff;
+    --accent: #6ff2d8;
+    --accent-ink: #000000;
+    --focus: #ffd400;
+  }
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html { font-size: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 2rem;
+}
+
+h1, h2, h3 { line-height: 1.2; margin: 0; text-wrap: balance; }
+h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
+h3 { font-size: 1.5rem; margin-bottom: 1rem; }
+p { margin: 0 0 1rem; max-width: 40rem; }
+
+:focus-visible {
+  outline: 4px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.skip {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 0.75rem 1rem;
+  z-index: 10;
+}
+.skip:focus { left: 0; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Estructura ---------- */
+.topbar, main, .footer { max-width: 44rem; margin-inline: auto; }
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding-block: 1rem;
+  border-bottom: 2px solid var(--line);
+}
+.brand { font-size: 2rem; letter-spacing: 0.01em; }
+.tools { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+main { padding-block: 1.5rem; }
+
+/* ---------- Botones ---------- */
+button {
+  font: inherit;
+  font-weight: 700;
+  min-height: 3.25rem;
+  min-width: 3.25rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius);
+  border: 2px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--fg);
+  cursor: pointer;
+}
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+
+button.primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  font-size: 1.25rem;
+  min-height: 3.75rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.views {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+.view-btn[aria-current="page"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+.actions button { flex: 1 1 8rem; }
+
+/* ---------- Opciones ---------- */
+fieldset { border: 0; padding: 0; margin: 0 0 1.5rem; min-width: 0; }
+legend { font-size: 1.25rem; font-weight: 700; padding: 0; margin-bottom: 0.75rem; }
+
+#practice-choices { display: grid; gap: 0.75rem; }
+#minute-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+
+.choice {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+}
+.choice:has(input:checked) { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.choice:has(input:focus-visible) { outline: 4px solid var(--focus); outline-offset: 3px; }
+.choice input {
+  flex: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin: 0.15rem 0 0;
+  accent-color: var(--accent);
+}
+.choice-body { display: grid; gap: 0.25rem; min-width: 0; }
+.choice-body small { font-size: 1rem; color: var(--muted); line-height: 1.5; }
+
+.compact .choice { align-items: center; justify-content: center; text-align: center; padding: 0.9rem 0.5rem; }
+.compact .choice input { margin: 0; }
+.compact .choice-body { text-align: left; }
+
+/* ---------- Círculo de respiración ---------- */
+.orb-wrap {
+  position: relative;
+  width: min(80vw, 20rem);
+  aspect-ratio: 1;
+  margin: 1rem auto 1.5rem;
+  display: grid;
+  place-items: center;
+}
+/* Anillo fijo: marca hasta dónde llega el círculo al inhalar. */
+.orb-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px dashed var(--line-strong);
+}
+.orb {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: scale(0.55);
+  transition-property: transform;
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.6s;
+}
+.orb[data-phase="inhale"],
+.orb[data-phase="hold-full"] { transform: scale(1); }
+
+.orb-text {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  color: var(--accent-ink);
+  text-align: center;
+}
+.phase-label { font-size: 1.75rem; font-weight: 700; }
+.phase-count { font-size: 3.5rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+
+.remaining { text-align: center; margin-inline: auto; color: var(--muted); }
+.remaining span { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--fg); }
+
+/* ---------- Yoga ---------- */
+.pose-list { padding-left: 1.5rem; margin: 0 0 1rem; }
+.pose-list li { padding-block: 0.2rem; }
+
+.eyebrow { font-weight: 700; color: var(--muted); margin-bottom: 0.5rem; }
+
+progress {
+  display: block;
+  width: 100%;
+  height: 0.9rem;
+  margin-bottom: 1.5rem;
+  appearance: none;
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  overflow: hidden;
+}
+progress::-webkit-progress-bar { background: var(--surface); }
+progress::-webkit-progress-value { background: var(--accent); }
+progress::-moz-progress-bar { background: var(--accent); }
+
+.steps { padding-left: 1.5rem; margin: 0 0 1.25rem; }
+.steps li { margin-bottom: 0.6rem; }
+
+.timer {
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  margin: 0 auto;
+}
+
+/* ---------- Pie ---------- */
+.footer { border-top: 2px solid var(--line); padding-top: 1.25rem; color: var(--muted); font-size: 1rem; }
+.stats { font-weight: 700; color: var(--fg); }
+
+/* ---------- Pantallas angostas ---------- */
+@media (max-width: 420px) {
+  #minute-choices { grid-template-columns: 1fr; }
+}
+
+/* ---------- Movimiento reducido ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .orb { transition: none !important; }
+}

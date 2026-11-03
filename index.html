@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Respirá · Respiración y yoga en silla</title>
+  <meta name="description" content="Práctica guiada de respiración y yoga en silla pensada para adultos mayores: letra grande, alto contraste y funciona sin internet.">
+  <meta name="theme-color" content="#1a6b58">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Ir al contenido principal</a>
+
+  <header class="topbar">
+    <h1 class="brand">Respirá</h1>
+    <div class="tools" role="group" aria-label="Ajustes de lectura">
+      <button type="button" id="font-down" aria-label="Achicar la letra">A−</button>
+      <button type="button" id="font-up" aria-label="Agrandar la letra">A+</button>
+      <button type="button" id="contrast" aria-pressed="false">Alto contraste</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <nav class="views" aria-label="Tipo de práctica">
+      <button type="button" class="view-btn" data-view="breath" aria-current="page">Respiración</button>
+      <button type="button" class="view-btn" data-view="yoga">Yoga en silla</button>
+    </nav>
+
+    <!-- RESPIRACIÓN -->
+    <section id="view-breath" aria-labelledby="h-breath">
+      <h2 id="h-breath">Respiración guiada</h2>
+
+      <div id="breath-setup">
+        <fieldset class="choices">
+          <legend>¿Cómo querés respirar?</legend>
+          <div id="practice-choices"></div>
+        </fieldset>
+        <fieldset class="choices compact">
+          <legend>¿Cuánto tiempo?</legend>
+          <div id="minute-choices"></div>
+        </fieldset>
+        <button type="button" id="breath-start" class="primary">Comenzar</button>
+      </div>
+
+      <div id="breath-session" hidden>
+        <div class="orb-wrap">
+          <div class="orb" id="orb" data-phase="ready"></div>
+          <div class="orb-text" aria-hidden="true">
+            <span id="phase-label" class="phase-label"></span>
+            <span id="phase-count" class="phase-count"></span>
+          </div>
+        </div>
+        <p class="remaining">Faltan <span id="breath-remaining">0:00</span></p>
+        <div class="actions">
+          <button type="button" id="breath-pause">Pausar</button>
+          <button type="button" id="breath-stop">Terminar</button>
+        </div>
+      </div>
+
+      <div id="breath-done" hidden>
+        <h3 id="breath-done-title" tabindex="-1">Muy bien, terminaste</h3>
+        <p id="breath-done-text"></p>
+        <button type="button" id="breath-again" class="primary">Volver al inicio</button>
+      </div>
+    </section>
+
+    <!-- YOGA EN SILLA -->
+    <section id="view-yoga" aria-labelledby="h-yoga" hidden>
+      <h2 id="h-yoga">Yoga en silla</h2>
+
+      <div id="yoga-setup">
+        <p id="yoga-intro"></p>
+        <ol id="yoga-list" class="pose-list"></ol>
+        <button type="button" id="yoga-start" class="primary">Comenzar secuencia</button>
+      </div>
+
+      <div id="yoga-session" hidden>
+        <p class="eyebrow" id="yoga-progress-text"></p>
+        <progress id="yoga-bar" max="8" value="0" aria-label="Avance de la secuencia"></progress>
+        <h3 id="yoga-title" tabindex="-1"></h3>
+        <ol id="yoga-steps" class="steps"></ol>
+        <p class="timer" id="yoga-timer" role="timer" aria-live="off">0:00</p>
+        <div class="actions">
+          <button type="button" id="yoga-prev">Anterior</button>
+          <button type="button" id="yoga-pause">Pausar</button>
+          <button type="button" id="yoga-next">Siguiente</button>
+          <button type="button" id="yoga-stop">Terminar</button>
+        </div>
+      </div>
+
+      <div id="yoga-done" hidden>
+        <h3 id="yoga-done-title" tabindex="-1">Muy bien, terminaste la secuencia</h3>
+        <p id="yoga-done-text"></p>
+        <button type="button" id="yoga-again" class="primary">Volver al inicio</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p id="stats" class="stats"></p>
+    <p class="safety">Esta práctica no reemplaza la indicación médica. Si sentís mareo o dolor, detenete y consultá a tu profesional de salud.</p>
+  </footer>
+
+  <div id="announce" class="sr-only" role="status" aria-live="polite"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/breath.js"></script>
+  <script src="js/sequence.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

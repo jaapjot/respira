@@ -1,0 +1,14 @@
+{
+  "name": "Respirá: respiración y yoga en silla",
+  "short_name": "Respirá",
+  "description": "Práctica guiada de respiración y yoga en silla para adultos mayores.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a1a1d",
+  "theme_color": "#1a6b58",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
