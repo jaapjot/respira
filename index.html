@@ -1,114 +1,2293 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="night">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Respirá · Respiración y yoga en silla</title>
-  <meta name="description" content="Práctica guiada de respiración y yoga en silla pensada para adultos mayores: letra grande, alto contraste y funciona sin internet.">
-  <meta name="theme-color" content="#1a6b58">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/styles.css">
+  <meta name="description" content="Práctica guiada de respiración y yoga en silla pensada para adultos mayores: figura animada, voz y sonido opcionales, letra grande, alto contraste y funciona sin internet.">
+  <meta name="theme-color" content="#061316">
+  <style>
+/*
+ * Respirá: estilos.
+ * Identidad: petróleo oscuro, un fondo vivo que respira (canvas) y una sola tinta de acento.
+ * Accesibilidad: tipografía del sistema (Verdana primero, muy legible y funciona sin internet),
+ * botones de al menos 3,25 rem, contraste AA o mejor, tres apariencias y respeto por "movimiento reducido".
+ */
+
+/* ---------- Apariencias (tokens) ---------- */
+:root,
+:root[data-theme="night"] {
+  --bg: #061316;
+  --surface: #0d2429;
+  --fg: #e9f5f2;
+  --muted: #aac8c1;
+  --line: #1d4249;
+  --line-strong: #6f9d95;
+  --accent: #4fd6c2;
+  --accent-ink: #04201c;
+  --focus: #fbbf24;
+  --danger: #ff9b8f;
+  --aura-opacity: 1;
+  color-scheme: dark;
+}
+
+:root[data-theme="day"] {
+  --bg: #eef5f3;
+  --surface: #ffffff;
+  --fg: #0f2420;
+  --muted: #3b5650;
+  --line: #c3d6d0;
+  --line-strong: #4f6d65;
+  --accent: #0d6b5c;
+  --accent-ink: #ffffff;
+  --focus: #9a3412;
+  --danger: #a12a1c;
+  --aura-opacity: 0.9;
+  color-scheme: light;
+}
+
+:root[data-theme="contrast"] {
+  --bg: #000000;
+  --surface: #000000;
+  --fg: #ffffff;
+  --muted: #ffffff;
+  --line: #ffffff;
+  --line-strong: #ffffff;
+  --accent: #6ff2d8;
+  --accent-ink: #000000;
+  --focus: #ffd400;
+  --danger: #ffb4a8;
+  --aura-opacity: 0.3;
+  color-scheme: dark;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html { font-size: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: Verdana, "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px));
+}
+
+h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
+h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
+h3 { font-size: 1.4rem; margin: 1.5rem 0 0.9rem; }
+p { margin: 0 0 1rem; max-width: 40rem; }
+
+:focus-visible { outline: 4px solid var(--focus); outline-offset: 3px; }
+
+.skip {
+  position: absolute; left: -999px; top: 0; z-index: 20;
+  background: var(--accent); color: var(--accent-ink); padding: 0.75rem 1rem;
+}
+.skip:focus { left: 0; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Fondo vivo */
+#aura {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none; opacity: var(--aura-opacity);
+}
+.shell { position: relative; z-index: 1; max-width: 44rem; margin: 0 auto; }
+
+/* ---------- Barra superior y ajustes ---------- */
+.topbar {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 1rem; padding-block: 1rem 0.75rem;
+}
+.brand-small {
+  font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  font-size: 0.95rem; color: var(--muted); padding-top: 0.7rem;
+}
+
+.settings { position: relative; }
+.settings summary {
+  list-style: none; cursor: pointer; font-weight: 700;
+  min-height: 3.25rem; display: inline-flex; align-items: center;
+  padding: 0.5rem 1.25rem; border-radius: 14px;
+  border: 2px solid var(--line-strong);
+  background: var(--surface); color: var(--fg);
+}
+.settings summary::-webkit-details-marker { display: none; }
+.settings[open] summary { border-color: var(--accent); }
+.settings-body {
+  position: absolute; right: 0; top: calc(100% + 0.5rem); z-index: 5;
+  width: min(86vw, 25rem); display: grid; gap: 1.1rem; padding: 1.1rem;
+  background: var(--surface); border: 2px solid var(--line-strong); border-radius: 18px;
+}
+.setting { display: grid; gap: 0.5rem; }
+.setting-label { font-weight: 700; color: var(--muted); font-size: 1rem; }
+.setting-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* ---------- Portada ---------- */
+.hero {
+  min-height: 15rem; display: grid; place-content: center; justify-items: center;
+  text-align: center; padding-block: 1.5rem;
+}
+#hero-title {
+  font-size: clamp(3.4rem, 15vw, 6rem); font-weight: 700; letter-spacing: 0.06em;
+  padding: 1.5rem 2rem;
+}
+.tagline {
+  margin: 0; font-size: 1rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted);
+}
+
+/* ---------- Botones ---------- */
+button {
+  font: inherit; font-weight: 700; min-height: 3.25rem; min-width: 3.25rem;
+  padding: 0.5rem 1.25rem; border-radius: 14px; cursor: pointer;
+  border: 2px solid var(--line-strong); background: var(--surface); color: var(--fg);
+}
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+button.primary {
+  width: 100%; margin-top: 1rem; min-height: 3.75rem; font-size: 1.25rem;
+  background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
+}
+button.danger { color: var(--danger); border-color: var(--danger); margin-top: 1rem; }
+
+.views { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1.25rem; }
+.view-btn { padding-inline: 0.5rem; font-size: 1rem; }
+.view-btn[aria-current="page"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.25rem; }
+.actions button { flex: 1 1 8rem; }
+
+/* ---------- Paneles ---------- */
+.panel {
+  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 1.5rem 1.25rem;
+}
+
+/* Modo inmersivo: durante la práctica el panel desaparece y el fondo vivo queda a la vista. */
+.in-session .panel {
+  background: transparent;
+  border-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.in-session .panel h2,
+.in-session .panel h3,
+.in-session .panel p,
+.in-session .panel li,
+.in-session .eyebrow,
+.in-session .cue,
+.in-session .timer {
+  text-shadow: 0 0 10px var(--bg), 0 0 4px var(--bg);
+}
+
+/* ---------- Opciones ---------- */
+fieldset { border: 0; padding: 0; margin: 0 0 1.5rem; min-width: 0; }
+legend { font-size: 1.2rem; font-weight: 700; padding: 0; margin-bottom: 0.75rem; }
+
+#practice-choices, #pose-choices { display: grid; gap: 0.75rem; }
+#minute-choices, #length-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+
+.choice {
+  display: flex; gap: 0.9rem; align-items: flex-start; padding: 1rem;
+  border: 2px solid var(--line); border-radius: 16px; cursor: pointer;
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+}
+.choice:has(input:checked) { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.choice:has(input:focus-visible) { outline: 4px solid var(--focus); outline-offset: 3px; }
+.choice input { flex: none; width: 1.6rem; height: 1.6rem; margin: 0.15rem 0 0; accent-color: var(--accent); }
+.choice-body { display: grid; gap: 0.25rem; min-width: 0; }
+.choice-body small { font-size: 1rem; color: var(--muted); line-height: 1.5; }
+
+.compact .choice { align-items: center; justify-content: center; padding: 0.9rem 0.5rem; }
+.compact .choice input { margin: 0; }
+
+#pose-choices .choice { padding: 0.75rem 1rem; align-items: center; }
+
+.custom-fields { border: 2px dashed var(--line-strong); border-radius: 16px; padding: 1rem; }
+.custom-fields legend { padding-inline: 0.5rem; }
+.custom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+.custom-grid label { display: grid; gap: 0.3rem; font-weight: 700; }
+.custom-grid input {
+  font: inherit; font-size: 1.25rem; min-height: 3.25rem; width: 100%;
+  padding: 0.4rem 0.8rem; border-radius: 12px;
+  border: 2px solid var(--line-strong); background: var(--bg); color: var(--fg);
+}
+.hint { color: var(--muted); font-size: 1rem; margin: 0.75rem 0 0; }
+.total { font-weight: 700; margin: 0 0 0.25rem; }
+
+/* ---------- Respiración ---------- */
+.stage {
+  position: relative; width: min(74vw, 17rem); aspect-ratio: 1; margin: 3rem auto 3rem;
+  border-radius: 50%; display: grid; place-items: center;
+}
+.stage::before {
+  content: ""; position: absolute; inset: -0.4rem; border-radius: 50%;
+  border: 2px dashed var(--line-strong); opacity: 0.8;
+}
+.stage-text { position: relative; display: grid; justify-items: center; text-align: center; text-shadow: 0 0 18px var(--bg), 0 0 6px var(--bg); }
+.phase-label { font-size: 1.9rem; font-weight: 700; }
+.phase-count { font-size: 4rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--accent); }
+.remaining { text-align: center; margin-inline: auto; color: var(--muted); }
+.remaining span { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--fg); }
+
+/* ---------- Yoga ---------- */
+.eyebrow { font-weight: 700; color: var(--muted); margin-bottom: 0.5rem; }
+progress {
+  display: block; width: 100%; height: 0.9rem; margin-bottom: 1rem; appearance: none;
+  border: 2px solid var(--line-strong); border-radius: 999px; background: var(--bg); overflow: hidden;
+}
+progress::-webkit-progress-bar { background: var(--bg); }
+progress::-webkit-progress-value { background: var(--accent); }
+progress::-moz-progress-bar { background: var(--accent); }
+
+.figure-stage { width: min(84vw, 20rem); aspect-ratio: 300 / 330; margin: 0.5rem auto 0; }
+.figure-stage svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.fig-chair rect, .fig-chair line { fill: none; stroke: var(--line-strong); stroke-width: 3; stroke-linecap: round; opacity: 0.55; }
+.fig-floor { stroke: var(--line); stroke-width: 3; stroke-linecap: round; }
+.fig-limb { stroke: var(--accent); stroke-linecap: round; fill: none; }
+.fig-head { fill: none; stroke: var(--accent); }
+.fig-nose { fill: var(--accent); }
+.fig-hand { fill: var(--accent); }
+.fig-body { filter: drop-shadow(0 0 7px color-mix(in srgb, var(--accent) 55%, transparent)); }
+
+.cue { text-align: center; margin: 0.5rem auto 0; font-size: 1.4rem; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+.steps { padding-left: 1.5rem; margin: 0 0 1.25rem; }
+.steps li { margin-bottom: 0.6rem; }
+.timer { font-size: 3rem; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; margin: 0 auto; }
+
+/* ---------- Progreso ---------- */
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+.tile {
+  display: grid; gap: 0.2rem; justify-items: center; text-align: center; padding: 1rem 0.5rem;
+  border: 2px solid var(--line); border-radius: 16px;
+  background: var(--bg); background: color-mix(in srgb, var(--bg) 55%, transparent);
+}
+.tile-num { font-size: 2.4rem; font-weight: 700; line-height: 1.1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.tile-label { font-size: 0.95rem; color: var(--muted); line-height: 1.3; }
+
+.chart svg { width: 100%; height: auto; display: block; }
+.chart .bar { fill: var(--accent); }
+.chart .bar-empty { fill: var(--line); }
+.chart text { fill: var(--muted); font-family: inherit; font-size: 13px; text-anchor: middle; }
+.chart text.val { fill: var(--fg); font-weight: 700; }
+
+.recent { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
+.recent li {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem;
+  padding: 0.7rem 1rem; border: 1px solid var(--line); border-radius: 12px;
+}
+.recent .when { color: var(--muted); }
+
+/* ---------- Pie ---------- */
+.footer { padding-top: 1.5rem; color: var(--muted); font-size: 1rem; text-align: center; }
+.footer .safety { margin-inline: auto; }
+.noscript { padding: 1rem; background: var(--surface); }
+
+/* ---------- Pantallas angostas ---------- */
+@media (max-width: 440px) {
+  .view-btn { font-size: 0.9rem; padding-inline: 0.25rem; }
+  #minute-choices, #length-choices { grid-template-columns: 1fr; }
+  .tiles { grid-template-columns: 1fr; }
+  .tile { grid-template-columns: auto 1fr; justify-items: start; text-align: left; gap: 1rem; align-items: center; padding: 0.8rem 1rem; }
+  .panel { padding: 1.25rem 1rem; }
+}
+
+</style>
 </head>
 <body>
+  <canvas id="aura" aria-hidden="true"></canvas>
   <a class="skip" href="#main">Ir al contenido principal</a>
 
-  <header class="topbar">
-    <h1 class="brand">Respirá</h1>
-    <div class="tools" role="group" aria-label="Ajustes de lectura">
-      <button type="button" id="font-down" aria-label="Achicar la letra">A−</button>
-      <button type="button" id="font-up" aria-label="Agrandar la letra">A+</button>
-      <button type="button" id="contrast" aria-pressed="false">Alto contraste</button>
-    </div>
-  </header>
-
-  <main id="main">
-    <nav class="views" aria-label="Tipo de práctica">
-      <button type="button" class="view-btn" data-view="breath" aria-current="page">Respiración</button>
-      <button type="button" class="view-btn" data-view="yoga">Yoga en silla</button>
-    </nav>
-
-    <!-- RESPIRACIÓN -->
-    <section id="view-breath" aria-labelledby="h-breath">
-      <h2 id="h-breath">Respiración guiada</h2>
-
-      <div id="breath-setup">
-        <fieldset class="choices">
-          <legend>¿Cómo querés respirar?</legend>
-          <div id="practice-choices"></div>
-        </fieldset>
-        <fieldset class="choices compact">
-          <legend>¿Cuánto tiempo?</legend>
-          <div id="minute-choices"></div>
-        </fieldset>
-        <button type="button" id="breath-start" class="primary">Comenzar</button>
-      </div>
-
-      <div id="breath-session" hidden>
-        <div class="orb-wrap">
-          <div class="orb" id="orb" data-phase="ready"></div>
-          <div class="orb-text" aria-hidden="true">
-            <span id="phase-label" class="phase-label"></span>
-            <span id="phase-count" class="phase-count"></span>
+  <div class="shell">
+    <header class="topbar">
+      <span class="brand-small">Respirá</span>
+      <details class="settings">
+        <summary>Ajustes</summary>
+        <div class="settings-body">
+          <div class="setting">
+            <span class="setting-label" id="lbl-font">Tamaño de letra</span>
+            <div class="setting-controls" role="group" aria-labelledby="lbl-font">
+              <button type="button" id="font-down" aria-label="Achicar la letra">A−</button>
+              <button type="button" id="font-up" aria-label="Agrandar la letra">A+</button>
+            </div>
+          </div>
+          <div class="setting">
+            <span class="setting-label" id="lbl-theme">Apariencia</span>
+            <div class="setting-controls" role="group" aria-labelledby="lbl-theme">
+              <button type="button" class="theme-btn" data-theme-choice="night" aria-pressed="true">Noche</button>
+              <button type="button" class="theme-btn" data-theme-choice="day" aria-pressed="false">Día</button>
+              <button type="button" class="theme-btn" data-theme-choice="contrast" aria-pressed="false">Alto contraste</button>
+            </div>
+          </div>
+          <div class="setting">
+            <span class="setting-label" id="lbl-extras">Acompañamiento</span>
+            <div class="setting-controls" role="group" aria-labelledby="lbl-extras">
+              <button type="button" id="sound-toggle" aria-pressed="false">Sonido suave</button>
+              <button type="button" id="voice-toggle" aria-pressed="false">Voz que guía</button>
+            </div>
           </div>
         </div>
-        <p class="remaining">Faltan <span id="breath-remaining">0:00</span></p>
-        <div class="actions">
-          <button type="button" id="breath-pause">Pausar</button>
-          <button type="button" id="breath-stop">Terminar</button>
-        </div>
-      </div>
+      </details>
+    </header>
 
-      <div id="breath-done" hidden>
-        <h3 id="breath-done-title" tabindex="-1">Muy bien, terminaste</h3>
-        <p id="breath-done-text"></p>
-        <button type="button" id="breath-again" class="primary">Volver al inicio</button>
-      </div>
+    <section class="hero" id="hero">
+      <h1 id="hero-title">Respirá</h1>
+      <p class="tagline">Respiración y yoga en silla</p>
     </section>
 
-    <!-- YOGA EN SILLA -->
-    <section id="view-yoga" aria-labelledby="h-yoga" hidden>
-      <h2 id="h-yoga">Yoga en silla</h2>
+    <main id="main">
+      <nav class="views" aria-label="Secciones">
+        <button type="button" class="view-btn" data-view="breath" aria-current="page">Respiración</button>
+        <button type="button" class="view-btn" data-view="yoga">Yoga en silla</button>
+        <button type="button" class="view-btn" data-view="progress">Mi progreso</button>
+      </nav>
 
-      <div id="yoga-setup">
-        <p id="yoga-intro"></p>
-        <ol id="yoga-list" class="pose-list"></ol>
-        <button type="button" id="yoga-start" class="primary">Comenzar secuencia</button>
-      </div>
+      <!-- RESPIRACIÓN -->
+      <section id="view-breath" class="panel" aria-labelledby="h-breath">
+        <h2 id="h-breath">Respiración guiada</h2>
 
-      <div id="yoga-session" hidden>
-        <p class="eyebrow" id="yoga-progress-text"></p>
-        <progress id="yoga-bar" max="8" value="0" aria-label="Avance de la secuencia"></progress>
-        <h3 id="yoga-title" tabindex="-1"></h3>
-        <ol id="yoga-steps" class="steps"></ol>
-        <p class="timer" id="yoga-timer" role="timer" aria-live="off">0:00</p>
-        <div class="actions">
-          <button type="button" id="yoga-prev">Anterior</button>
-          <button type="button" id="yoga-pause">Pausar</button>
-          <button type="button" id="yoga-next">Siguiente</button>
-          <button type="button" id="yoga-stop">Terminar</button>
+        <div id="breath-setup">
+          <fieldset class="choices">
+            <legend>¿Cómo querés respirar?</legend>
+            <div id="practice-choices"></div>
+          </fieldset>
+
+          <fieldset class="custom-fields" id="custom-fields" hidden>
+            <legend>Tus tiempos, en segundos</legend>
+            <div class="custom-grid">
+              <label>Inhalar <input type="number" id="custom-inhale" min="2" max="10" inputmode="numeric"></label>
+              <label>Sostener <input type="number" id="custom-hold-full" min="0" max="10" inputmode="numeric"></label>
+              <label>Exhalar <input type="number" id="custom-exhale" min="2" max="10" inputmode="numeric"></label>
+              <label>Sostener <input type="number" id="custom-hold-empty" min="0" max="10" inputmode="numeric"></label>
+            </div>
+            <p class="hint">Inhalar y exhalar: de 2 a 10. Las pausas pueden ser 0.</p>
+          </fieldset>
+
+          <fieldset class="choices compact">
+            <legend>¿Cuánto tiempo?</legend>
+            <div id="minute-choices"></div>
+          </fieldset>
+          <button type="button" id="breath-start" class="primary">Comenzar</button>
         </div>
-      </div>
 
-      <div id="yoga-done" hidden>
-        <h3 id="yoga-done-title" tabindex="-1">Muy bien, terminaste la secuencia</h3>
-        <p id="yoga-done-text"></p>
-        <button type="button" id="yoga-again" class="primary">Volver al inicio</button>
-      </div>
-    </section>
-  </main>
+        <div id="breath-session" hidden>
+          <div class="stage" id="orb-stage">
+            <div class="stage-text" aria-hidden="true">
+              <span id="phase-label" class="phase-label"></span>
+              <span id="phase-count" class="phase-count"></span>
+            </div>
+          </div>
+          <p class="remaining">Faltan <span id="breath-remaining">0:00</span></p>
+          <div class="actions">
+            <button type="button" id="breath-pause">Pausar</button>
+            <button type="button" id="breath-stop">Terminar</button>
+          </div>
+        </div>
 
-  <footer class="footer">
-    <p id="stats" class="stats"></p>
-    <p class="safety">Esta práctica no reemplaza la indicación médica. Si sentís mareo o dolor, detenete y consultá a tu profesional de salud.</p>
-  </footer>
+        <div id="breath-done" hidden>
+          <h3 id="breath-done-title" tabindex="-1">Muy bien, terminaste</h3>
+          <p id="breath-done-text"></p>
+          <button type="button" id="breath-again" class="primary">Volver al inicio</button>
+        </div>
+      </section>
+
+      <!-- YOGA EN SILLA -->
+      <section id="view-yoga" class="panel" aria-labelledby="h-yoga" hidden>
+        <h2 id="h-yoga">Yoga en silla</h2>
+
+        <div id="yoga-setup">
+          <p>Armá tu secuencia: elegí las posturas y cuánto querés que dure cada una. Todo se hace sentada o sentado.</p>
+          <fieldset class="choices">
+            <legend>Posturas</legend>
+            <div id="pose-choices"></div>
+          </fieldset>
+          <fieldset class="choices compact">
+            <legend>Ritmo</legend>
+            <div id="length-choices"></div>
+          </fieldset>
+          <p class="total" id="yoga-total"></p>
+          <button type="button" id="yoga-start" class="primary">Comenzar secuencia</button>
+        </div>
+
+        <div id="yoga-session" hidden>
+          <p class="eyebrow" id="yoga-progress-text"></p>
+          <progress id="yoga-bar" max="8" value="0" aria-label="Avance de la secuencia"></progress>
+          <div class="figure-stage" id="figure-stage">
+            <svg id="figure" viewBox="0 0 300 330" role="img" aria-label="Figura que muestra el movimiento de la postura"></svg>
+          </div>
+          <p class="cue" id="yoga-cue" aria-hidden="true"></p>
+          <h3 id="yoga-title" tabindex="-1"></h3>
+          <ol id="yoga-steps" class="steps"></ol>
+          <p class="timer" id="yoga-timer" role="timer" aria-live="off">0:00</p>
+          <div class="actions">
+            <button type="button" id="yoga-prev">Anterior</button>
+            <button type="button" id="yoga-pause">Pausar</button>
+            <button type="button" id="yoga-next">Siguiente</button>
+            <button type="button" id="yoga-stop">Terminar</button>
+          </div>
+        </div>
+
+        <div id="yoga-done" hidden>
+          <h3 id="yoga-done-title" tabindex="-1">Muy bien, terminaste la secuencia</h3>
+          <p id="yoga-done-text"></p>
+          <button type="button" id="yoga-again" class="primary">Volver al inicio</button>
+        </div>
+      </section>
+
+      <!-- PROGRESO -->
+      <section id="view-progress" class="panel" aria-labelledby="h-progress" hidden>
+        <h2 id="h-progress">Mi progreso</h2>
+        <div class="tiles">
+          <div class="tile"><span class="tile-num" id="p-streak">0</span><span class="tile-label">días seguidos</span></div>
+          <div class="tile"><span class="tile-num" id="p-week">0</span><span class="tile-label">minutos esta semana</span></div>
+          <div class="tile"><span class="tile-num" id="p-total">0</span><span class="tile-label">prácticas en total</span></div>
+        </div>
+        <h3>Últimos 7 días</h3>
+        <div id="week-chart" class="chart" role="img"></div>
+        <h3>Últimas prácticas</h3>
+        <ul id="recent-list" class="recent"></ul>
+        <button type="button" id="clear-history" class="danger" hidden>Borrar historial</button>
+        <p class="hint">Tu historial se guarda solo en este dispositivo. No se envía a ningún lado.</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p class="safety">Esta práctica no reemplaza la indicación médica. Si sentís mareo o dolor, detenete y consultá a tu profesional de salud.</p>
+    </footer>
+  </div>
 
   <div id="announce" class="sr-only" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript">Respirá necesita JavaScript para funcionar. Activalo en tu navegador e intentá de nuevo.</p></noscript>
 
-  <script src="js/data.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/breath.js"></script>
-  <script src="js/sequence.js"></script>
-  <script src="js/app.js"></script>
+  <script>
+/*
+ * Lógica pura de Respirá: no toca el navegador, así que se puede probar con Node.
+ * Tiempos, planes de respiración, rutinas, fechas, racha e interpolación de poses.
+ */
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  else { root.Respira = root.Respira || {}; Object.assign(root.Respira, api); }
+})(typeof window !== "undefined" ? window : globalThis, function () {
+  "use strict";
+
+  /* ---------- Tiempo ---------- */
+
+  /** 65 -> "1:05". Redondea hacia arriba para que el reloj no muestre 0:00 antes de tiempo. */
+  function formatTime(totalSeconds) {
+    var t = Math.max(0, Math.ceil(totalSeconds - 1e-6));
+    var m = Math.floor(t / 60);
+    var s = t % 60;
+    return m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  /* ---------- Respiración ---------- */
+
+  function easeInOut(p) {
+    var x = Math.min(1, Math.max(0, p));
+    return (1 - Math.cos(Math.PI * x)) / 2;
+  }
+
+  /** Nivel del círculo (0 = chico, 1 = grande) según la fase y su avance p (0 a 1). */
+  function phaseLevel(type, p) {
+    switch (type) {
+      case "inhale": return easeInOut(p);
+      case "exhale": return 1 - easeInOut(p);
+      case "hold-full": return 1;
+      default: return 0; // "hold-empty" y "ready"
+    }
+  }
+
+  function clampInt(value, min, max, fallback) {
+    if (value === null || value === undefined || value === "") return fallback;
+    var n = Math.round(Number(value));
+    if (!isFinite(n)) return fallback;
+    return Math.min(max, Math.max(min, n));
+  }
+
+  /** Arma el patrón de una respiración personalizada. Inhalar y exhalar: de 2 a 10 s. Pausas: de 0 a 10 s. */
+  function buildPattern(custom) {
+    var c = custom || {};
+    var inhale = clampInt(c.inhale, 2, 10, 4);
+    var holdFull = clampInt(c.holdFull, 0, 10, 0);
+    var exhale = clampInt(c.exhale, 2, 10, 6);
+    var holdEmpty = clampInt(c.holdEmpty, 0, 10, 0);
+
+    var pattern = [{ phase: "inhale", label: "Inhalá", seconds: inhale }];
+    if (holdFull) pattern.push({ phase: "hold-full", label: "Sostené", seconds: holdFull });
+    pattern.push({ phase: "exhale", label: "Exhalá", seconds: exhale });
+    if (holdEmpty) pattern.push({ phase: "hold-empty", label: "Sostené", seconds: holdEmpty });
+    return pattern;
+  }
+
+  function cycleLength(pattern) {
+    return pattern.reduce(function (sum, p) { return sum + p.seconds; }, 0);
+  }
+
+  /** La sesión dura una cantidad entera de ciclos, para terminar siempre al final de una exhalación o pausa. */
+  function buildBreathPlan(pattern, minutes) {
+    var length = cycleLength(pattern);
+    var cycles = Math.max(1, Math.round((minutes * 60) / length));
+    return { pattern: pattern, cycleLength: length, cycles: cycles, total: cycles * length };
+  }
+
+  /* ---------- Rutinas de yoga ---------- */
+
+  var LENGTH_FACTORS = { short: 0.7, normal: 1, long: 1.4 };
+
+  /** Filtra las posturas elegidas y ajusta el tiempo de cada una (múltiplos de 5 s, mínimo 20 s). */
+  function buildRoutine(poses, selectedIds, lengthKey) {
+    var factor = LENGTH_FACTORS[lengthKey] || 1;
+    return poses
+      .filter(function (p) { return selectedIds.indexOf(p.id) !== -1; })
+      .map(function (p) {
+        var seconds = Math.max(20, Math.round((p.seconds * factor) / 5) * 5);
+        return Object.assign({}, p, { seconds: seconds });
+      });
+  }
+
+  function routineSeconds(routine) {
+    return routine.reduce(function (sum, p) { return sum + p.seconds; }, 0);
+  }
+
+  /* ---------- Fechas, racha y resumen semanal ---------- */
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+  function dateKey(date) {
+    return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+  }
+
+  function addDays(key, n) {
+    var p = key.split("-").map(Number);
+    return dateKey(new Date(p[0], p[1] - 1, p[2] + n));
+  }
+
+  /** Días seguidos con práctica. Si hoy todavía no practicaste, la racha cuenta desde ayer. */
+  function computeStreak(history, todayKey) {
+    var days = {};
+    history.forEach(function (e) { days[e.d] = true; });
+    var cursor = days[todayKey] ? todayKey : addDays(todayKey, -1);
+    var count = 0;
+    while (days[cursor]) {
+      count += 1;
+      cursor = addDays(cursor, -1);
+    }
+    return count;
+  }
+
+  /** Segundos practicados en cada uno de los últimos 7 días (del más viejo al de hoy). */
+  function weekSummary(history, todayKey) {
+    var out = [];
+    for (var i = 6; i >= 0; i--) {
+      var key = addDays(todayKey, -i);
+      var seconds = 0;
+      history.forEach(function (e) { if (e.d === key) seconds += e.s; });
+      out.push({ date: key, seconds: seconds });
+    }
+    return out;
+  }
+
+  /* ---------- Interpolación (para animar la figura entre dos poses) ---------- */
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  /** Interpola números, listas y objetos con la misma forma. */
+  function lerpValue(a, b, t) {
+    if (Array.isArray(a)) return a.map(function (v, i) { return lerpValue(v, b[i], t); });
+    if (a && typeof a === "object") {
+      var out = {};
+      Object.keys(a).forEach(function (k) { out[k] = lerpValue(a[k], b[k], t); });
+      return out;
+    }
+    return lerp(a, b, t);
+  }
+
+  /** Onda suave de 0 a 1 y de vuelta a 0 en un período: sirve para "inhalo y subo, exhalo y bajo". */
+  function cycleU(seconds, period) {
+    var t = (seconds % period) / period;
+    return (1 - Math.cos(2 * Math.PI * t)) / 2;
+  }
+
+  return {
+    formatTime: formatTime,
+    easeInOut: easeInOut,
+    phaseLevel: phaseLevel,
+    buildPattern: buildPattern,
+    cycleLength: cycleLength,
+    buildBreathPlan: buildBreathPlan,
+    LENGTH_FACTORS: LENGTH_FACTORS,
+    buildRoutine: buildRoutine,
+    routineSeconds: routineSeconds,
+    dateKey: dateKey,
+    addDays: addDays,
+    computeStreak: computeStreak,
+    weekSummary: weekSummary,
+    lerp: lerp,
+    lerpValue: lerpValue,
+    cycleU: cycleU
+  };
+});
+
+</script>
+  <script>
+/*
+ * Contenido de Respirá: ritmos de respiración y posturas de yoga en silla.
+ * Está separado del código para poder editar el contenido sin tocar la lógica.
+ *
+ * Cada postura tiene dos poses clave, "a" y "b". La figura animada pasa de una a otra
+ * al ritmo de la respiración (inhalar: de a a b, exhalar: de b a a).
+ * Ángulos de los brazos: [hombro, antebrazo] en grados. 0 = hacia abajo, 90 = hacia afuera,
+ * 180 = hacia arriba, negativo = hacia adentro. "lean" inclina el torso, "twist" lo gira,
+ * "shrug" sube los hombros, "turn" gira la cabeza (-1 izquierda, 1 derecha), "lLeg"/"rLeg" abren la pierna.
+ */
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  else { root.Respira = root.Respira || {}; Object.assign(root.Respira, api); }
+})(typeof window !== "undefined" ? window : globalThis, function () {
+  "use strict";
+
+  var PRACTICES = {
+    calma: {
+      name: "Calma",
+      blurb: "Inhalás 4 segundos y exhalás 6. La exhalación larga suele ayudar a aflojar el cuerpo.",
+      pattern: [
+        { phase: "inhale", label: "Inhalá", seconds: 4 },
+        { phase: "exhale", label: "Exhalá", seconds: 6 }
+      ]
+    },
+    equilibrio: {
+      name: "Equilibrio",
+      blurb: "Cuatro tiempos iguales: inhalás, sostenés, exhalás y sostenés. Ordena el ritmo.",
+      pattern: [
+        { phase: "inhale", label: "Inhalá", seconds: 4 },
+        { phase: "hold-full", label: "Sostené", seconds: 4 },
+        { phase: "exhale", label: "Exhalá", seconds: 4 },
+        { phase: "hold-empty", label: "Sostené", seconds: 4 }
+      ]
+    },
+    despertar: {
+      name: "Despertar",
+      blurb: "Inhalás 3 segundos y exhalás 3, sin pausas. Un ritmo parejo para empezar el día.",
+      pattern: [
+        { phase: "inhale", label: "Inhalá", seconds: 3 },
+        { phase: "exhale", label: "Exhalá", seconds: 3 }
+      ]
+    },
+    personalizada: {
+      name: "Personalizada",
+      blurb: "Elegís cuántos segundos dura cada parte de la respiración.",
+      custom: true,
+      pattern: null // se arma con los valores que cargue la persona
+    }
+  };
+
+  var MINUTES = [1, 3, 5];
+
+  var BASE_POSE = {
+    lArm: [12, -25],
+    rArm: [12, -25],
+    lean: 0,
+    twist: 0,
+    shrugL: 0,
+    shrugR: 0,
+    turn: 0,
+    lLeg: 4,
+    rLeg: 4
+  };
+
+  function K(overrides) { return Object.assign({}, BASE_POSE, overrides); }
+
+  // Contenido a revisar por quien da la clase antes de publicar.
+  var POSES = [
+    {
+      id: "llegar",
+      name: "Llegar a la silla",
+      seconds: 60,
+      steps: [
+        "Sentate en el borde de la silla, con los pies apoyados en el piso.",
+        "Apoyá las manos sobre los muslos.",
+        "Alargá la columna como si un hilo te tirara suavemente de la cabeza.",
+        "Respirá por la nariz, con calma."
+      ],
+      a: K({}),
+      b: K({ shrugL: 3, shrugR: 3 })
+    },
+    {
+      id: "brazos",
+      name: "Brazos al cielo",
+      seconds: 45,
+      steps: [
+        "Inhalá y subí los brazos por los costados hasta donde te resulte cómodo.",
+        "Exhalá y bajalos despacio.",
+        "Repetí al ritmo de tu respiración."
+      ],
+      a: K({ lArm: [8, -5], rArm: [8, -5] }),
+      b: K({ lArm: [172, 176], rArm: [172, 176] })
+    },
+    {
+      id: "hombros",
+      name: "Hombros que sueltan",
+      seconds: 45,
+      steps: [
+        "Subí los hombros hacia las orejas al inhalar.",
+        "Soltalos hacia abajo al exhalar.",
+        "Después probá círculos lentos: primero hacia atrás y luego hacia adelante."
+      ],
+      a: K({}),
+      b: K({ shrugL: 14, shrugR: 14 })
+    },
+    {
+      id: "cuello",
+      name: "Cuello suave",
+      seconds: 45,
+      steps: [
+        "Girá la cabeza hacia la derecha, sin forzar, y mirá hacia ese lado.",
+        "Volvé al centro y girá hacia la izquierda.",
+        "No lleves la cabeza hacia atrás."
+      ],
+      a: K({ turn: -1 }),
+      b: K({ turn: 1 })
+    },
+    {
+      id: "lateral",
+      name: "Inclinación lateral",
+      seconds: 45,
+      steps: [
+        "Apoyá una mano en el asiento o en el muslo.",
+        "Inhalá subiendo el otro brazo.",
+        "Exhalá inclinándote hacia el costado, sin forzar.",
+        "Volvé al centro y alterná de lado."
+      ],
+      a: K({ lean: 14, lArm: [190, 198], rArm: [10, -30] }),
+      b: K({ lean: -14, rArm: [190, 198], lArm: [10, -30] })
+    },
+    {
+      id: "torsion",
+      name: "Torsión sentada",
+      seconds: 45,
+      steps: [
+        "Apoyá una mano en la rodilla contraria y la otra en el respaldo o en el asiento.",
+        "Inhalá para alargarte y exhalá para girar un poco.",
+        "A mitad del tiempo, cambiá de lado."
+      ],
+      a: K({ twist: -1, lArm: [40, -70], rArm: [18, -35] }),
+      b: K({ twist: 1, rArm: [40, -70], lArm: [18, -35] })
+    },
+    {
+      id: "piernas",
+      name: "Piernas que despiertan",
+      seconds: 45,
+      steps: [
+        "Estirá una pierna hacia adelante y flexioná el pie.",
+        "Bajala con calma y alterná con la otra.",
+        "Mantené la espalda apoyada y erguida."
+      ],
+      a: K({ lLeg: 48, rLeg: 4 }),
+      b: K({ lLeg: 4, rLeg: 48 })
+    },
+    {
+      id: "quietud",
+      name: "Quietud final",
+      seconds: 60,
+      steps: [
+        "Apoyá las manos en el regazo y cerrá los ojos si te resulta cómodo.",
+        "Respirá de forma natural.",
+        "Notá cómo está tu cuerpo ahora."
+      ],
+      a: K({}),
+      b: K({ shrugL: 2, shrugR: 2 })
+    }
+  ];
+
+  return { PRACTICES: PRACTICES, MINUTES: MINUTES, BASE_POSE: BASE_POSE, POSES: POSES };
+});
+
+</script>
+  <script>
+/*
+ * Ajustes, rutina elegida e historial, guardados en el navegador (localStorage).
+ * Si el navegador bloquea el almacenamiento (modo privado, por ejemplo), los datos
+ * quedan en memoria y la app sigue funcionando mientras esté abierta.
+ */
+(function (R) {
+  "use strict";
+
+  var KEY = "respira:v2";
+  var MAX_HISTORY = 300;
+
+  function defaults() {
+    return {
+      v: 2,
+      fontStep: 0,
+      theme: null, // "night" | "day" | "contrast"; null = según el sistema
+      sound: false,
+      voice: false,
+      custom: { inhale: 4, holdFull: 0, exhale: 6, holdEmpty: 0 },
+      routine: { ids: R.POSES.map(function (p) { return p.id; }), length: "normal" },
+      history: [] // { d: "2026-11-02", t: "breath" | "yoga", n: nombre, s: segundos }
+    };
+  }
+
+  var memory = defaults();
+
+  function merge(base, saved) {
+    var out = Object.assign({}, base, saved);
+    out.custom = Object.assign({}, base.custom, saved && saved.custom);
+    out.routine = Object.assign({}, base.routine, saved && saved.routine);
+    if (!Array.isArray(out.history)) out.history = [];
+    return out;
+  }
+
+  function read() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) memory = merge(defaults(), JSON.parse(raw));
+    } catch (e) {
+      /* se usa la copia en memoria */
+    }
+    return JSON.parse(JSON.stringify(memory));
+  }
+
+  function write(state) {
+    memory = JSON.parse(JSON.stringify(state));
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+    } catch (e) {
+      /* sin almacenamiento: queda en memoria */
+    }
+  }
+
+  R.store = {
+    get: read,
+
+    update: function (patch) {
+      var next = Object.assign(read(), patch);
+      write(next);
+      return next;
+    },
+
+    addEntry: function (entry) {
+      var state = read();
+      state.history.push(entry);
+      if (state.history.length > MAX_HISTORY) state.history = state.history.slice(-MAX_HISTORY);
+      write(state);
+      return state;
+    },
+
+    clearHistory: function () {
+      var state = read();
+      state.history = [];
+      write(state);
+      return state;
+    }
+  };
+})(window.Respira = window.Respira || {});
+
+</script>
+  <script>
+/*
+ * Sonido ambiente generado con Web Audio, sin archivos de audio.
+ * Un colchón suave de tres tonos que se abre al inhalar (más volumen y brillo)
+ * y se cierra al exhalar, más una campana corta para marcar cambios de postura.
+ * Queda apagado hasta que la persona lo activa.
+ */
+(function (R) {
+  "use strict";
+
+  var Ctx = window.AudioContext || window.webkitAudioContext;
+
+  function AudioEngine() {
+    this.ctx = null;
+    this.master = null;
+    this.filter = null;
+    this.hushed = false;
+    this.started = false;
+  }
+
+  AudioEngine.supported = !!Ctx;
+
+  AudioEngine.prototype.ensure = function () {
+    if (!Ctx) return false;
+    if (this.ctx) return true;
+
+    var ctx = new Ctx();
+    var master = ctx.createGain();
+    var filter = ctx.createBiquadFilter();
+    master.gain.value = 0;
+    filter.type = "lowpass";
+    filter.frequency.value = 400;
+    filter.connect(master);
+    master.connect(ctx.destination);
+
+    // Tonos graves y suaves, con una leve desafinación para que no suenen fríos.
+    [[110, 0.5], [164.81, 0.32], [220.9, 0.2]].forEach(function (pair) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = pair[0];
+      gain.gain.value = pair[1];
+      osc.connect(gain);
+      gain.connect(filter);
+      osc.start();
+    });
+
+    this.ctx = ctx;
+    this.master = master;
+    this.filter = filter;
+    return true;
+  };
+
+  /** Debe llamarse desde un clic o toque, porque los navegadores lo exigen para reproducir sonido. */
+  AudioEngine.prototype.start = function () {
+    if (!this.ensure()) return;
+    this.hushed = false;
+    this.started = true;
+    if (this.ctx.state === "suspended") this.ctx.resume();
+  };
+
+  AudioEngine.prototype.setLevel = function (level) {
+    if (!this.started || this.hushed || !this.ctx) return;
+    var t = this.ctx.currentTime;
+    this.master.gain.setTargetAtTime(0.02 + 0.07 * level, t, 0.2);
+    this.filter.frequency.setTargetAtTime(280 + 900 * level, t, 0.25);
+  };
+
+  /** Baja el volumen a cero (pausa o fin de sesión). */
+  AudioEngine.prototype.hush = function () {
+    if (!this.ctx) return;
+    this.hushed = true;
+    this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
+  };
+
+  AudioEngine.prototype.unhush = function () {
+    this.hushed = false;
+  };
+
+  AudioEngine.prototype.stop = function () {
+    this.hush();
+    this.started = false;
+  };
+
+  /** Campana suave: dos tonos que se apagan en un par de segundos. */
+  AudioEngine.prototype.chime = function () {
+    if (!this.started || !this.ctx) return;
+    var ctx = this.ctx;
+    var t = ctx.currentTime;
+    [528, 792].forEach(function (freq, i) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(i === 0 ? 0.12 : 0.05, t + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 2.2);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 2.3);
+    });
+  };
+
+  R.AudioEngine = AudioEngine;
+})(window.Respira = window.Respira || {});
+
+</script>
+  <script>
+/*
+ * Guía hablada con la síntesis de voz del navegador (speechSynthesis).
+ * Lee en voz alta cada fase de la respiración y las instrucciones de cada postura.
+ * Prefiere una voz en español rioplatense y, si no hay, cualquier voz en español.
+ * Queda apagada hasta que la persona la activa.
+ */
+(function (R) {
+  "use strict";
+
+  var supported = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+
+  function pickVoice() {
+    if (!supported) return null;
+    var voices = window.speechSynthesis.getVoices() || [];
+    var ar = voices.filter(function (v) { return /^es[-_]AR/i.test(v.lang); })[0];
+    var es = voices.filter(function (v) { return /^es/i.test(v.lang); })[0];
+    return ar || es || null;
+  }
+
+  R.voice = {
+    supported: supported,
+    enabled: false,
+
+    speak: function (text) {
+      if (!supported || !this.enabled || !text) return;
+      try {
+        window.speechSynthesis.cancel();
+        var u = new window.SpeechSynthesisUtterance(text);
+        u.lang = "es-AR";
+        u.rate = 0.9;
+        var v = pickVoice();
+        if (v) u.voice = v;
+        window.speechSynthesis.speak(u);
+      } catch (e) {
+        /* sin voz disponible */
+      }
+    },
+
+    stop: function () {
+      if (!supported) return;
+      try { window.speechSynthesis.cancel(); } catch (e) { /* nada que cancelar */ }
+    }
+  };
+})(window.Respira = window.Respira || {});
+
+</script>
+  <script>
+/*
+ * Aura: el fondo vivo de la app, dibujado en un canvas.
+ * Una nube de partículas conectadas que se expande al inhalar y se recoge al exhalar.
+ * Se centra sobre el elemento que se le indique (el título, el círculo o la figura).
+ * Cada cambio de fase lanza una onda que se abre y se desvanece.
+ * Con "movimiento reducido" activado dibuja una imagen quieta en vez de animar.
+ */
+(function (R) {
+  "use strict";
+
+  var TWO_PI = Math.PI * 2;
+
+  function hexToRgb(hex) {
+    var h = String(hex).trim().replace("#", "");
+    if (h.length === 3) h = h.replace(/(.)/g, "$1$1");
+    if (!/^[0-9a-f]{6}$/i.test(h)) return [79, 214, 194];
+    return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+  }
+
+  function Aura(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas && canvas.getContext ? canvas.getContext("2d") : null;
+    this.w = 0;
+    this.h = 0;
+    this.particles = [];
+    this.ripples = [];
+    this.rgb = [79, 214, 194];
+    this.now = 0;
+    this.static = false;
+    if (this.ctx) this.resize();
+  }
+
+  Aura.prototype.refreshColors = function () {
+    var value = getComputedStyle(document.documentElement).getPropertyValue("--accent");
+    this.rgb = hexToRgb(value);
+  };
+
+  Aura.prototype.resize = function () {
+    if (!this.ctx) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.w = window.innerWidth;
+    this.h = window.innerHeight;
+    this.canvas.width = Math.round(this.w * dpr);
+    this.canvas.height = Math.round(this.h * dpr);
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.seed(this.w < 600 ? 70 : 120);
+  };
+
+  Aura.prototype.seed = function (count) {
+    this.particles = [];
+    for (var i = 0; i < count; i++) {
+      this.particles.push({
+        a: Math.random() * TWO_PI,       // ángulo inicial
+        r: 0.3 + Math.random() * 0.7,    // distancia relativa al centro
+        w: (Math.random() - 0.5) * 0.3,  // velocidad de giro
+        s: 0.8 + Math.random() * 1.8,    // tamaño
+        p: Math.random() * TWO_PI        // fase del temblor
+      });
+    }
+  };
+
+  /** Lanza una onda desde el centro. */
+  Aura.prototype.pulse = function () {
+    if (this.static) return;
+    this.ripples.push({ t0: this.now });
+    if (this.ripples.length > 4) this.ripples.shift();
+  };
+
+  function rgba(rgb, alpha) {
+    return "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + "," + Math.max(0, Math.min(1, alpha)).toFixed(3) + ")";
+  }
+
+  /**
+   * @param {number} time       segundos
+   * @param {number} level      0 (recogida) a 1 (expandida)
+   * @param {Element} anchor    elemento sobre el que se centra
+   * @param {number} intensity  0 a 1
+   */
+  Aura.prototype.draw = function (time, level, anchor, intensity) {
+    var ctx = this.ctx;
+    if (!ctx) return;
+    this.now = time;
+    var w = this.w;
+    var h = this.h;
+    ctx.clearRect(0, 0, w, h);
+
+    var cx = w / 2;
+    var cy = h * 0.32;
+    var base = Math.min(w, h) * 0.3;
+    if (anchor) {
+      var rect = anchor.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        cx = rect.left + rect.width / 2;
+        cy = rect.top + rect.height / 2;
+        base = Math.max(110, Math.min(rect.width, rect.height) * 0.6);
+      }
+    }
+
+    var t = this.static ? 0 : time;
+    var maxR = base * 1.15;
+    var radius = maxR * (0.3 + 0.7 * level);
+    var rgb = this.rgb;
+
+    // Resplandor central
+    var glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius * 1.15);
+    glow.addColorStop(0, rgba(rgb, 0.3 * intensity));
+    glow.addColorStop(0.6, rgba(rgb, 0.1 * intensity));
+    glow.addColorStop(1, rgba(rgb, 0));
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius * 1.15, 0, TWO_PI);
+    ctx.fill();
+
+    // Posición de cada partícula
+    var pts = [];
+    var spin = 1 + level * 0.6;
+    for (var i = 0; i < this.particles.length; i++) {
+      var p = this.particles[i];
+      var ang = p.a + p.w * t * spin;
+      var rr = radius * p.r * (1 + 0.05 * Math.sin(t * 0.8 + p.p));
+      pts.push({ x: cx + Math.cos(ang) * rr, y: cy + Math.sin(ang) * rr, s: p.s });
+    }
+
+    // Conexiones entre partículas cercanas
+    var thresh = maxR * 0.3;
+    var thresh2 = thresh * thresh;
+    ctx.lineWidth = 1;
+    for (var a = 0; a < pts.length; a++) {
+      for (var b = a + 1; b < pts.length; b++) {
+        var dx = pts[a].x - pts[b].x;
+        var dy = pts[a].y - pts[b].y;
+        var d2 = dx * dx + dy * dy;
+        if (d2 < thresh2) {
+          var alpha = (1 - Math.sqrt(d2) / thresh) * 0.35 * intensity;
+          ctx.strokeStyle = rgba(rgb, alpha);
+          ctx.beginPath();
+          ctx.moveTo(pts[a].x, pts[a].y);
+          ctx.lineTo(pts[b].x, pts[b].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Partículas
+    var dotAlpha = (0.5 + 0.4 * level) * intensity;
+    ctx.fillStyle = rgba(rgb, dotAlpha);
+    for (var k = 0; k < pts.length; k++) {
+      ctx.beginPath();
+      ctx.arc(pts[k].x, pts[k].y, pts[k].s * (0.8 + level * 0.5), 0, TWO_PI);
+      ctx.fill();
+    }
+
+    // Ondas
+    if (!this.static) {
+      var live = [];
+      for (var r = 0; r < this.ripples.length; r++) {
+        var age = (time - this.ripples[r].t0) / 2.4;
+        if (age >= 0 && age < 1) {
+          live.push(this.ripples[r]);
+          ctx.strokeStyle = rgba(rgb, (1 - age) * 0.5 * intensity);
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, maxR * (0.4 + 0.9 * age), 0, TWO_PI);
+          ctx.stroke();
+        }
+      }
+      this.ripples = live;
+    }
+  };
+
+  R.Aura = Aura;
+})(window.Respira = window.Respira || {});
+
+</script>
+  <script>
+/*
+ * Figura guía: una persona sentada dibujada con líneas, que hace cada postura.
+ * computeJoints() es cinemática directa: a partir de ángulos calcula dónde queda cada articulación.
+ * Figure dibuja esos puntos en un SVG. Para animar, se interpolan los ángulos de dos poses clave.
+ */
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  else { root.Respira = root.Respira || {}; Object.assign(root.Respira, api); }
+})(typeof window !== "undefined" ? window : globalThis, function () {
+  "use strict";
+
+  var NS = "http://www.w3.org/2000/svg";
+
+  // Medidas en unidades del SVG (viewBox 300 x 330).
+  var CX = 150;
+  var HIP_Y = 214;
+  var TORSO = 92;
+  var SHOULDER_HALF = 30;
+  var UPPER = 50;
+  var FORE = 46;
+  var HEAD_R = 20;
+  var NECK = 12;
+  var THIGH_HALF = 24;
+  var KNEE_OUT = 40;
+  var SHIN = 66;
+
+  function rad(deg) { return (deg * Math.PI) / 180; }
+
+  /**
+   * Brazo: ángulos medidos desde "hacia abajo". side = -1 izquierda, +1 derecha.
+   * 0 = abajo, 90 = hacia afuera, 180 = arriba, negativo = hacia adentro.
+   */
+  function arm(shoulder, angles, side) {
+    var a = rad(angles[0]);
+    var f = rad(angles[1]);
+    var elbow = { x: shoulder.x + side * Math.sin(a) * UPPER, y: shoulder.y + Math.cos(a) * UPPER };
+    var hand = { x: elbow.x + side * Math.sin(f) * FORE, y: elbow.y + Math.cos(f) * FORE };
+    return { elbow: elbow, hand: hand };
+  }
+
+  function leg(hip, knee, angle, side) {
+    var a = rad(angle);
+    var foot = { x: knee.x + side * Math.sin(a) * SHIN, y: knee.y + Math.cos(a) * SHIN };
+    var toe = { x: foot.x + side * 16, y: foot.y + 3 };
+    return { hip: hip, knee: knee, foot: foot, toe: toe };
+  }
+
+  function computeJoints(p) {
+    var lean = rad(p.lean || 0);
+    var twist = p.twist || 0;
+
+    var hip = { x: CX, y: HIP_Y };
+    var ux = Math.sin(lean);
+    var uy = -Math.cos(lean);
+    var neck = { x: hip.x + ux * TORSO + twist * 6, y: hip.y + uy * TORSO };
+
+    // El hombro más lejano se acorta cuando el torso gira.
+    var half = SHOULDER_HALF * Math.cos(rad(twist * 40));
+    var px = Math.cos(lean);
+    var py = Math.sin(lean);
+    var sl = { x: neck.x - px * half, y: neck.y - py * half - (p.shrugL || 0) };
+    var sr = { x: neck.x + px * half, y: neck.y + py * half - (p.shrugR || 0) };
+
+    var headTurn = Math.max(-1, Math.min(1, (p.turn || 0) + twist * 0.7));
+    var head = { x: neck.x + ux * (NECK + HEAD_R), y: neck.y + uy * (NECK + HEAD_R), r: HEAD_R };
+    var nose = { x: head.x + headTurn * 9, y: head.y + 2 };
+
+    var la = arm(sl, p.lArm, -1);
+    var ra = arm(sr, p.rArm, 1);
+
+    var hipL = { x: hip.x - THIGH_HALF, y: hip.y + 4 };
+    var hipR = { x: hip.x + THIGH_HALF, y: hip.y + 4 };
+    var kneeL = { x: hip.x - KNEE_OUT, y: hip.y + 22 };
+    var kneeR = { x: hip.x + KNEE_OUT, y: hip.y + 22 };
+    var ll = leg(hipL, kneeL, p.lLeg, -1);
+    var rl = leg(hipR, kneeR, p.rLeg, 1);
+
+    return {
+      hip: hip, neck: neck, head: head, nose: nose,
+      shoulderL: sl, shoulderR: sr,
+      elbowL: la.elbow, handL: la.hand,
+      elbowR: ra.elbow, handR: ra.hand,
+      hipL: ll.hip, kneeL: ll.knee, footL: ll.foot, toeL: ll.toe,
+      hipR: rl.hip, kneeR: rl.knee, footR: rl.foot, toeR: rl.toe
+    };
+  }
+
+  /* ---------- Dibujo en SVG (solo en el navegador) ---------- */
+
+  // [nombre, desde, hasta, grosor]
+  var SEGMENTS = [
+    ["thighL", "hipL", "kneeL", 14],
+    ["thighR", "hipR", "kneeR", 14],
+    ["shinL", "kneeL", "footL", 12],
+    ["shinR", "kneeR", "footR", 12],
+    ["footL", "footL", "toeL", 9],
+    ["footR", "footR", "toeR", 9],
+    ["torso", "hip", "neck", 18],
+    ["shoulders", "shoulderL", "shoulderR", 12],
+    ["upperL", "shoulderL", "elbowL", 11],
+    ["foreL", "elbowL", "handL", 10],
+    ["upperR", "shoulderR", "elbowR", 11],
+    ["foreR", "elbowR", "handR", 10]
+  ];
+
+  function el(name, attrs) {
+    var node = document.createElementNS(NS, name);
+    Object.keys(attrs || {}).forEach(function (k) { node.setAttribute(k, attrs[k]); });
+    return node;
+  }
+
+  function Figure(svg) {
+    this.svg = svg;
+    this.lines = {};
+
+    // Silla: respaldo, asiento y patas. Es fija.
+    var chair = el("g", { "class": "fig-chair" });
+    chair.appendChild(el("rect", { x: 100, y: 120, width: 100, height: 100, rx: 10 }));
+    chair.appendChild(el("line", { x1: 88, y1: 226, x2: 212, y2: 226 }));
+    chair.appendChild(el("line", { x1: 96, y1: 226, x2: 96, y2: 312 }));
+    chair.appendChild(el("line", { x1: 204, y1: 226, x2: 204, y2: 312 }));
+    svg.appendChild(chair);
+    svg.appendChild(el("line", { "class": "fig-floor", x1: 40, y1: 314, x2: 260, y2: 314 }));
+
+    var body = el("g", { "class": "fig-body" });
+    SEGMENTS.forEach(function (seg) {
+      var line = el("line", { "class": "fig-limb", "stroke-width": seg[3] });
+      body.appendChild(line);
+      this.lines[seg[0]] = line;
+    }, this);
+
+    this.head = el("circle", { "class": "fig-head", "stroke-width": 6 });
+    this.nose = el("circle", { "class": "fig-nose", r: 3.5 });
+    this.handL = el("circle", { "class": "fig-hand", r: 7 });
+    this.handR = el("circle", { "class": "fig-hand", r: 7 });
+    body.appendChild(this.head);
+    body.appendChild(this.nose);
+    body.appendChild(this.handL);
+    body.appendChild(this.handR);
+    svg.appendChild(body);
+  }
+
+  Figure.prototype.render = function (params) {
+    var j = computeJoints(params);
+    var lines = this.lines;
+    SEGMENTS.forEach(function (seg) {
+      var a = j[seg[1]];
+      var b = j[seg[2]];
+      var line = lines[seg[0]];
+      line.setAttribute("x1", a.x.toFixed(1));
+      line.setAttribute("y1", a.y.toFixed(1));
+      line.setAttribute("x2", b.x.toFixed(1));
+      line.setAttribute("y2", b.y.toFixed(1));
+    });
+    this.head.setAttribute("cx", j.head.x.toFixed(1));
+    this.head.setAttribute("cy", j.head.y.toFixed(1));
+    this.head.setAttribute("r", j.head.r);
+    this.nose.setAttribute("cx", j.nose.x.toFixed(1));
+    this.nose.setAttribute("cy", j.nose.y.toFixed(1));
+    this.handL.setAttribute("cx", j.handL.x.toFixed(1));
+    this.handL.setAttribute("cy", j.handL.y.toFixed(1));
+    this.handR.setAttribute("cx", j.handR.x.toFixed(1));
+    this.handR.setAttribute("cy", j.handR.y.toFixed(1));
+  };
+
+  return { computeJoints: computeJoints, Figure: Figure };
+});
+
+</script>
+  <script>
+/*
+ * Sesión de respiración guiada.
+ * Lleva el tiempo con un reloj (se puede reemplazar en las pruebas) y avanza por fases.
+ * No dibuja nada: expone snapshot() y la interfaz decide cómo mostrarlo.
+ */
+(function (root, factory) {
+  var isNode = typeof module === "object" && module.exports;
+  var deps = isNode ? require("./logic.js") : root.Respira;
+  var api = factory(deps);
+  if (isNode) module.exports = api;
+  else { root.Respira = root.Respira || {}; Object.assign(root.Respira, api); }
+})(typeof window !== "undefined" ? window : globalThis, function (L) {
+  "use strict";
+
+  function defaultClock() {
+    return typeof performance !== "undefined" ? performance.now() : Date.now();
+  }
+
+  /**
+   * @param {{pattern: Array, total: number}} plan  resultado de buildBreathPlan
+   * @param {{onPhase?: function, onDone?: function}} hooks
+   * @param {function} [clock]  devuelve milisegundos; por defecto performance.now
+   */
+  function BreathSession(plan, hooks, clock) {
+    this.pattern = plan.pattern;
+    this.total = plan.total;
+    this.hooks = hooks || {};
+    this.clock = clock || defaultClock;
+    this.left = plan.total;
+    this.index = 0;
+    this.phaseElapsed = 0;
+    this.running = false;
+    this.finished = false;
+    this.last = 0;
+    this.timer = null;
+  }
+
+  BreathSession.prototype.start = function () {
+    this.running = true;
+    this.last = this.clock();
+    if (this.hooks.onPhase) this.hooks.onPhase(this.pattern[0], 0);
+    var self = this;
+    this.timer = setInterval(function () { self.update(); }, 100);
+  };
+
+  /** Suma el tiempo que pasó desde la última vez. Se puede llamar las veces que haga falta. */
+  BreathSession.prototype.update = function () {
+    if (!this.running) return;
+    var now = this.clock();
+    var dt = (now - this.last) / 1000;
+    this.last = now;
+    this.advance(dt);
+  };
+
+  BreathSession.prototype.advance = function (dt) {
+    if (this.finished || dt <= 0) return;
+    dt = Math.min(dt, this.left); // nunca se pasa del final
+    this.left -= dt;
+    this.phaseElapsed += dt;
+
+    var phase = this.pattern[this.index];
+    while (this.phaseElapsed >= phase.seconds - 1e-9 && this.left > 1e-9) {
+      this.phaseElapsed -= phase.seconds;
+      this.index = (this.index + 1) % this.pattern.length;
+      phase = this.pattern[this.index];
+      if (this.hooks.onPhase) this.hooks.onPhase(phase, this.index);
+    }
+    if (this.left <= 1e-9) {
+      this.left = 0;
+      this.finish();
+    }
+  };
+
+  BreathSession.prototype.finish = function () {
+    this.running = false;
+    this.finished = true;
+    clearInterval(this.timer);
+    if (this.hooks.onDone) this.hooks.onDone(this.total);
+  };
+
+  BreathSession.prototype.pause = function () {
+    if (!this.running) return;
+    this.update();
+    this.running = false;
+    clearInterval(this.timer);
+  };
+
+  BreathSession.prototype.resume = function () {
+    if (this.running || this.finished) return;
+    this.running = true;
+    this.last = this.clock();
+    var self = this;
+    this.timer = setInterval(function () { self.update(); }, 100);
+  };
+
+  BreathSession.prototype.stop = function () {
+    this.running = false;
+    clearInterval(this.timer);
+  };
+
+  /** Estado actual: fase, segundos de la fase, segundos que faltan y nivel del círculo (0 a 1). */
+  BreathSession.prototype.snapshot = function () {
+    this.update();
+    var phase = this.pattern[this.index];
+    return {
+      phase: phase.phase,
+      label: phase.label,
+      count: Math.max(1, Math.ceil(phase.seconds - this.phaseElapsed - 1e-6)),
+      remaining: this.left,
+      level: L.phaseLevel(phase.phase, this.phaseElapsed / phase.seconds)
+    };
+  };
+
+  return { BreathSession: BreathSession };
+});
+
+</script>
+  <script>
+/*
+ * Secuencia de yoga en silla.
+ * Recorre una rutina postura por postura. Avanza sola al terminar el tiempo de cada una,
+ * y también se puede ir hacia adelante o atrás a mano.
+ * Cada 8 segundos se repite un ciclo de respiración (inhalar y exhalar) que usa la figura animada.
+ */
+(function (root, factory) {
+  var isNode = typeof module === "object" && module.exports;
+  var deps = isNode ? require("./logic.js") : root.Respira;
+  var api = factory(deps);
+  if (isNode) module.exports = api;
+  else { root.Respira = root.Respira || {}; Object.assign(root.Respira, api); }
+})(typeof window !== "undefined" ? window : globalThis, function (L) {
+  "use strict";
+
+  var CYCLE_SECONDS = 8;
+
+  function defaultClock() {
+    return typeof performance !== "undefined" ? performance.now() : Date.now();
+  }
+
+  /**
+   * @param {Array} routine  posturas ya filtradas (resultado de buildRoutine)
+   * @param {{onPose?: function, onDone?: function}} hooks
+   * @param {function} [clock]
+   */
+  function PoseSession(routine, hooks, clock) {
+    this.routine = routine;
+    this.hooks = hooks || {};
+    this.clock = clock || defaultClock;
+    this.index = 0;
+    this.left = routine[0].seconds;
+    this.poseElapsed = 0;
+    this.elapsed = 0;
+    this.running = false;
+    this.finished = false;
+    this.last = 0;
+    this.timer = null;
+  }
+
+  PoseSession.prototype.start = function () {
+    this.running = true;
+    this.last = this.clock();
+    this.notifyPose();
+    var self = this;
+    this.timer = setInterval(function () { self.update(); }, 100);
+  };
+
+  PoseSession.prototype.notifyPose = function () {
+    if (this.hooks.onPose) this.hooks.onPose(this.routine[this.index], this.index, this.routine.length);
+  };
+
+  PoseSession.prototype.update = function () {
+    if (!this.running) return;
+    var now = this.clock();
+    var dt = (now - this.last) / 1000;
+    this.last = now;
+    this.advance(dt);
+  };
+
+  PoseSession.prototype.advance = function (dt) {
+    if (this.finished || dt <= 0) return;
+    this.left -= dt;
+    this.poseElapsed += dt;
+    this.elapsed += dt;
+    if (this.left <= 1e-9) this.go(1);
+  };
+
+  /** +1 avanza, -1 retrocede. Pasar la última postura termina la sesión. */
+  PoseSession.prototype.go = function (delta) {
+    if (this.finished) return;
+    var next = this.index + delta;
+    if (next < 0) return;
+    if (next >= this.routine.length) {
+      this.finish();
+      return;
+    }
+    this.index = next;
+    this.left = this.routine[next].seconds;
+    this.poseElapsed = 0;
+    this.notifyPose();
+  };
+
+  PoseSession.prototype.finish = function () {
+    this.running = false;
+    this.finished = true;
+    clearInterval(this.timer);
+    if (this.hooks.onDone) this.hooks.onDone(Math.round(this.elapsed));
+  };
+
+  PoseSession.prototype.pause = function () {
+    if (!this.running) return;
+    this.update();
+    this.running = false;
+    clearInterval(this.timer);
+  };
+
+  PoseSession.prototype.resume = function () {
+    if (this.running || this.finished) return;
+    this.running = true;
+    this.last = this.clock();
+    var self = this;
+    this.timer = setInterval(function () { self.update(); }, 100);
+  };
+
+  PoseSession.prototype.stop = function () {
+    this.running = false;
+    clearInterval(this.timer);
+  };
+
+  /** u va de 0 a 1 y vuelve a 0 cada ciclo; sirve para animar la figura y el fondo. */
+  PoseSession.prototype.snapshot = function () {
+    this.update();
+    var pose = this.routine[this.index];
+    var inCycle = this.poseElapsed % CYCLE_SECONDS;
+    return {
+      index: this.index,
+      total: this.routine.length,
+      pose: pose,
+      left: this.left,
+      progress: this.index + (pose.seconds - this.left) / pose.seconds,
+      u: L.cycleU(this.poseElapsed, CYCLE_SECONDS),
+      cue: inCycle < CYCLE_SECONDS / 2 ? "Inhalá" : "Exhalá"
+    };
+  };
+
+  return { PoseSession: PoseSession, CYCLE_SECONDS: CYCLE_SECONDS };
+});
+
+</script>
+  <script>
+/*
+ * Conecta la interfaz con la lógica: ajustes, navegación, las dos prácticas,
+ * el progreso y el bucle de animación que alimenta el fondo, la figura y el sonido.
+ */
+(function (R) {
+  "use strict";
+
+  var FONT_STEPS = [1, 1.15, 1.3, 1.5];
+  var THEMES = ["night", "day", "contrast"];
+  var LENGTHS = [["short", "Corto"], ["normal", "Normal"], ["long", "Largo"]];
+
+  var root = document.documentElement;
+  var reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var settings = R.store.get();
+
+  var aura = new R.Aura(document.getElementById("aura"));
+  var audio = new R.AudioEngine();
+  var voice = R.voice;
+  var figure = null;
+
+  var breath = null;
+  var yoga = null;
+  var currentView = "breath";
+  var currentPractice = null;
+  var wakeLock = null;
+  var shown = { label: "", count: "", remaining: "", timer: "", cue: "" };
+
+  function $(id) { return document.getElementById(id); }
+  function setHidden(id, hidden) { $(id).hidden = hidden; }
+
+  function minutesText(seconds) {
+    var m = Math.max(1, Math.round(seconds / 60));
+    return m + (m === 1 ? " minuto" : " minutos");
+  }
+
+  function announce(text) {
+    var region = $("announce");
+    region.textContent = "";
+    setTimeout(function () { region.textContent = text; }, 50);
+  }
+
+  /* ---------- Pantalla encendida durante la práctica ---------- */
+  function keepAwake() {
+    try {
+      if (navigator.wakeLock) {
+        navigator.wakeLock.request("screen").then(function (lock) { wakeLock = lock; }, function () {});
+      }
+    } catch (e) { /* no disponible */ }
+  }
+  function releaseAwake() {
+    try {
+      if (wakeLock) { wakeLock.release(); wakeLock = null; }
+    } catch (e) { /* ya liberado */ }
+  }
+
+  /* ---------- Ajustes ---------- */
+  /** La identidad de la app es la noche (petróleo oscuro). "Día" y "Alto contraste" son opciones. */
+  function initialTheme() {
+    return THEMES.indexOf(settings.theme) !== -1 ? settings.theme : "night";
+  }
+
+  function applySettings() {
+    var step = Math.min(Math.max(Number(settings.fontStep) || 0, 0), FONT_STEPS.length - 1);
+    settings.fontStep = step;
+    root.style.fontSize = Math.round(FONT_STEPS[step] * 100) + "%";
+    $("font-down").disabled = step === 0;
+    $("font-up").disabled = step === FONT_STEPS.length - 1;
+
+    var theme = initialTheme();
+    root.setAttribute("data-theme", theme);
+    document.querySelectorAll(".theme-btn").forEach(function (btn) {
+      btn.setAttribute("aria-pressed", String(btn.getAttribute("data-theme-choice") === theme));
+    });
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", theme === "day" ? "#eef5f3" : theme === "contrast" ? "#000000" : "#061316");
+    aura.refreshColors();
+
+    voice.enabled = !!settings.voice && voice.supported;
+    $("sound-toggle").setAttribute("aria-pressed", String(!!settings.sound));
+    $("voice-toggle").setAttribute("aria-pressed", String(!!settings.voice));
+    $("sound-toggle").hidden = !R.AudioEngine.supported;
+    $("voice-toggle").hidden = !voice.supported;
+  }
+
+  function bindSettings() {
+    $("font-up").addEventListener("click", function () {
+      settings = R.store.update({ fontStep: settings.fontStep + 1 });
+      applySettings();
+    });
+    $("font-down").addEventListener("click", function () {
+      settings = R.store.update({ fontStep: settings.fontStep - 1 });
+      applySettings();
+    });
+    document.querySelectorAll(".theme-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        settings = R.store.update({ theme: btn.getAttribute("data-theme-choice") });
+        applySettings();
+      });
+    });
+    $("sound-toggle").addEventListener("click", function () {
+      settings = R.store.update({ sound: !settings.sound });
+      if (settings.sound) {
+        audio.start(); // el clic habilita el audio en el navegador
+        if (!breath && !yoga) audio.hush();
+      } else {
+        audio.stop();
+      }
+      applySettings();
+    });
+    $("voice-toggle").addEventListener("click", function () {
+      settings = R.store.update({ voice: !settings.voice });
+      voice.enabled = !!settings.voice;
+      if (settings.voice) voice.speak("Voz activada.");
+      else voice.stop();
+      applySettings();
+    });
+  }
+
+  /* ---------- Opciones armadas desde los datos ---------- */
+  function buildChoice(type, name, value, checked, title, description) {
+    var label = document.createElement("label");
+    label.className = "choice";
+
+    var input = document.createElement("input");
+    input.type = type;
+    input.name = name;
+    input.value = value;
+    input.checked = checked;
+
+    var body = document.createElement("span");
+    body.className = "choice-body";
+    var strong = document.createElement("b");
+    strong.textContent = title;
+    body.appendChild(strong);
+    if (description) {
+      var small = document.createElement("small");
+      small.textContent = description;
+      body.appendChild(small);
+    }
+
+    label.appendChild(input);
+    label.appendChild(body);
+    return label;
+  }
+
+  function selected(name) {
+    var input = document.querySelector('input[name="' + name + '"]:checked');
+    return input ? input.value : null;
+  }
+
+  function buildBreathChoices() {
+    var box = $("practice-choices");
+    Object.keys(R.PRACTICES).forEach(function (key, i) {
+      var p = R.PRACTICES[key];
+      box.appendChild(buildChoice("radio", "practice", key, i === 0, p.name, p.blurb));
+    });
+    box.addEventListener("change", updateCustomVisibility);
+
+    var minutes = $("minute-choices");
+    R.MINUTES.forEach(function (m, i) {
+      minutes.appendChild(buildChoice("radio", "minutes", String(m), i === 1, m + (m === 1 ? " minuto" : " minutos")));
+    });
+
+    $("custom-inhale").value = settings.custom.inhale;
+    $("custom-hold-full").value = settings.custom.holdFull;
+    $("custom-exhale").value = settings.custom.exhale;
+    $("custom-hold-empty").value = settings.custom.holdEmpty;
+    ["custom-inhale", "custom-hold-full", "custom-exhale", "custom-hold-empty"].forEach(function (id) {
+      $(id).addEventListener("change", saveCustom);
+    });
+  }
+
+  function updateCustomVisibility() {
+    setHidden("custom-fields", selected("practice") !== "personalizada");
+  }
+
+  function readCustom() {
+    return {
+      inhale: $("custom-inhale").value,
+      holdFull: $("custom-hold-full").value,
+      exhale: $("custom-exhale").value,
+      holdEmpty: $("custom-hold-empty").value
+    };
+  }
+
+  /** Guarda los tiempos y muestra en pantalla los valores ya corregidos. */
+  function saveCustom() {
+    var pattern = R.buildPattern(readCustom());
+    var fixed = { inhale: 0, holdFull: 0, exhale: 0, holdEmpty: 0 };
+    pattern.forEach(function (p) {
+      if (p.phase === "inhale") fixed.inhale = p.seconds;
+      if (p.phase === "hold-full") fixed.holdFull = p.seconds;
+      if (p.phase === "exhale") fixed.exhale = p.seconds;
+      if (p.phase === "hold-empty") fixed.holdEmpty = p.seconds;
+    });
+    $("custom-inhale").value = fixed.inhale;
+    $("custom-hold-full").value = fixed.holdFull;
+    $("custom-exhale").value = fixed.exhale;
+    $("custom-hold-empty").value = fixed.holdEmpty;
+    settings = R.store.update({ custom: fixed });
+  }
+
+  function buildYogaChoices() {
+    var box = $("pose-choices");
+    R.POSES.forEach(function (pose) {
+      var checked = settings.routine.ids.indexOf(pose.id) !== -1;
+      box.appendChild(buildChoice("checkbox", "pose", pose.id, checked, pose.name));
+    });
+    box.addEventListener("change", onRoutineChange);
+
+    var lengths = $("length-choices");
+    LENGTHS.forEach(function (pair) {
+      lengths.appendChild(buildChoice("radio", "length", pair[0], settings.routine.length === pair[0], pair[1]));
+    });
+    lengths.addEventListener("change", onRoutineChange);
+    updateYogaTotal();
+  }
+
+  function selectedPoseIds() {
+    return Array.prototype.map.call(document.querySelectorAll('input[name="pose"]:checked'), function (i) { return i.value; });
+  }
+
+  function currentRoutine() {
+    return R.buildRoutine(R.POSES, selectedPoseIds(), selected("length") || "normal");
+  }
+
+  function updateYogaTotal() {
+    var routine = currentRoutine();
+    $("yoga-start").disabled = routine.length === 0;
+    $("yoga-total").textContent = routine.length === 0
+      ? "Elegí al menos una postura."
+      : routine.length + (routine.length === 1 ? " postura" : " posturas") + " · unos " + minutesText(R.routineSeconds(routine));
+  }
+
+  function onRoutineChange() {
+    settings = R.store.update({ routine: { ids: selectedPoseIds(), length: selected("length") || "normal" } });
+    updateYogaTotal();
+  }
+
+  /* ---------- Bucle de animación ---------- */
+  function currentAnchor() {
+    if (breath) return $("orb-stage");
+    if (yoga) return $("figure-stage");
+    return $("hero-title");
+  }
+
+  function setText(key, id, value) {
+    if (shown[key] !== value) {
+      shown[key] = value;
+      $(id).textContent = value;
+    }
+  }
+
+  function render(time) {
+    var level = 0.5 + 0.5 * Math.sin(time * 0.45); // respiración lenta en reposo
+    var intensity = currentView === "progress" ? 0.35 : 0.55;
+
+    // Durante la práctica el panel se vuelve transparente para que se vea el fondo.
+    var inSession = !!(breath || yoga);
+    if (inSession !== document.body.classList.contains("in-session")) {
+      document.body.classList.toggle("in-session", inSession);
+    }
+
+    if (breath) {
+      var b = breath.snapshot();
+      setText("label", "phase-label", b.label);
+      setText("count", "phase-count", String(b.count));
+      setText("remaining", "breath-remaining", R.formatTime(b.remaining));
+      level = b.level;
+      intensity = 1;
+      audio.setLevel(level);
+    } else if (yoga) {
+      var y = yoga.snapshot();
+      if (yoga) { // la sesión pudo terminar al actualizar
+        setText("timer", "yoga-timer", R.formatTime(y.left));
+        setText("cue", "yoga-cue", y.cue);
+        $("yoga-bar").value = y.progress;
+        figure.render(R.lerpValue(y.pose.a, y.pose.b, reduceMotion ? 1 : y.u));
+        level = 0.15 + 0.85 * y.u;
+        intensity = 0.8;
+        audio.setLevel(level);
+      }
+    }
+    aura.draw(time, level, currentAnchor(), intensity);
+  }
+
+  function loop(ts) {
+    render(ts / 1000);
+    schedule();
+  }
+
+  function schedule() {
+    if (reduceMotion) setTimeout(function () { loop(performance.now()); }, 250);
+    else requestAnimationFrame(loop);
+  }
+
+  /* ---------- Navegación ---------- */
+  function resetShown() {
+    shown = { label: "", count: "", remaining: "", timer: "", cue: "" };
+  }
+
+  function stopAll() {
+    if (breath) { breath.stop(); breath = null; }
+    if (yoga) { yoga.stop(); yoga = null; }
+    releaseAwake();
+    audio.hush();
+    voice.stop();
+    resetBreath();
+    resetYoga();
+  }
+
+  function showView(name) {
+    stopAll();
+    currentView = name;
+    setHidden("view-breath", name !== "breath");
+    setHidden("view-yoga", name !== "yoga");
+    setHidden("view-progress", name !== "progress");
+    setHidden("hero", false);
+    document.querySelectorAll(".view-btn").forEach(function (btn) {
+      if (btn.getAttribute("data-view") === name) btn.setAttribute("aria-current", "page");
+      else btn.removeAttribute("aria-current");
+    });
+    if (name === "progress") renderProgress();
+  }
+
+  function recordSession(type, name, seconds) {
+    R.store.addEntry({ d: R.dateKey(new Date()), t: type, n: name, s: Math.round(seconds) });
+  }
+
+  /* ---------- Respiración ---------- */
+  function resetBreath() {
+    setHidden("breath-setup", false);
+    setHidden("breath-session", true);
+    setHidden("breath-done", true);
+    $("breath-pause").textContent = "Pausar";
+  }
+
+  function startBreath() {
+    var key = selected("practice");
+    var practice = R.PRACTICES[key];
+    var pattern = practice.custom ? R.buildPattern(readCustom()) : practice.pattern;
+    var plan = R.buildBreathPlan(pattern, Number(selected("minutes")));
+    currentPractice = practice;
+
+    resetShown();
+    setHidden("hero", true);
+    setHidden("breath-setup", true);
+    setHidden("breath-session", false);
+    $("breath-pause").textContent = "Pausar";
+
+    breath = new R.BreathSession(plan, {
+      onPhase: function (phase) {
+        announce(phase.label);
+        voice.speak(phase.label);
+        aura.pulse();
+      },
+      onDone: function (seconds) {
+        releaseAwake();
+        audio.hush();
+        recordSession("breath", currentPractice.name, seconds);
+        setHidden("hero", false);
+        setHidden("breath-session", true);
+        setHidden("breath-done", false);
+        $("breath-done-text").textContent =
+          "Respiraste durante " + minutesText(seconds) + " con el ritmo «" + currentPractice.name + "». " +
+          "Tomate un momento para notar cómo te sentís.";
+        voice.speak("Muy bien, terminaste. Tomate un momento para notar cómo te sentís.");
+        $("breath-done-title").focus();
+        breath = null;
+      }
+    });
+
+    keepAwake();
+    if (settings.sound) audio.start();
+    breath.start();
+    $("breath-pause").focus();
+  }
+
+  function toggleBreathPause() {
+    if (!breath) return;
+    if (breath.running) {
+      breath.pause();
+      audio.hush();
+      voice.stop();
+      $("breath-pause").textContent = "Seguir";
+      announce("Pausa");
+    } else {
+      breath.resume();
+      audio.unhush();
+      $("breath-pause").textContent = "Pausar";
+    }
+  }
+
+  function stopBreath() {
+    if (breath) breath.stop();
+    breath = null;
+    releaseAwake();
+    audio.hush();
+    voice.stop();
+    setHidden("hero", false);
+    resetBreath();
+    $("breath-start").focus();
+  }
+
+  /* ---------- Yoga en silla ---------- */
+  function resetYoga() {
+    setHidden("yoga-setup", false);
+    setHidden("yoga-session", true);
+    setHidden("yoga-done", true);
+    $("yoga-pause").textContent = "Pausar";
+  }
+
+  function showPose(pose, index, total) {
+    $("yoga-title").textContent = pose.name;
+    var steps = $("yoga-steps");
+    steps.textContent = "";
+    pose.steps.forEach(function (text) {
+      var li = document.createElement("li");
+      li.textContent = text;
+      steps.appendChild(li);
+    });
+    var position = "Postura " + (index + 1) + " de " + total;
+    $("yoga-progress-text").textContent = position;
+    $("yoga-bar").max = total;
+    $("yoga-prev").disabled = index === 0;
+    $("yoga-next").textContent = index === total - 1 ? "Finalizar" : "Siguiente";
+    announce(position + ": " + pose.name);
+    voice.speak(pose.name + ". " + pose.steps.join(" "));
+    if (settings.sound) audio.chime();
+    aura.pulse();
+  }
+
+  function startYoga() {
+    var routine = currentRoutine();
+    if (!routine.length) return;
+
+    resetShown();
+    setHidden("hero", true);
+    setHidden("yoga-setup", true);
+    setHidden("yoga-session", false);
+    $("yoga-pause").textContent = "Pausar";
+
+    yoga = new R.PoseSession(routine, {
+      onPose: showPose,
+      onDone: function (seconds) {
+        releaseAwake();
+        audio.hush();
+        recordSession("yoga", routine.length + (routine.length === 1 ? " postura" : " posturas"), seconds);
+        setHidden("hero", false);
+        setHidden("yoga-session", true);
+        setHidden("yoga-done", false);
+        $("yoga-done-text").textContent =
+          "Practicaste durante " + minutesText(seconds) + ". Bajá el ritmo y tomate un momento antes de levantarte.";
+        voice.speak("Muy bien, terminaste la secuencia. Tomate un momento antes de levantarte.");
+        $("yoga-done-title").focus();
+        yoga = null;
+      }
+    });
+
+    keepAwake();
+    if (settings.sound) audio.start();
+    yoga.start();
+    $("yoga-pause").focus();
+  }
+
+  function toggleYogaPause() {
+    if (!yoga) return;
+    if (yoga.running) {
+      yoga.pause();
+      audio.hush();
+      voice.stop();
+      $("yoga-pause").textContent = "Seguir";
+      announce("Pausa");
+    } else {
+      yoga.resume();
+      audio.unhush();
+      $("yoga-pause").textContent = "Pausar";
+    }
+  }
+
+  function stopYoga() {
+    if (yoga) yoga.stop();
+    yoga = null;
+    releaseAwake();
+    audio.hush();
+    voice.stop();
+    setHidden("hero", false);
+    resetYoga();
+    $("yoga-start").focus();
+  }
+
+  /* ---------- Progreso ---------- */
+  var SVG_NS = "http://www.w3.org/2000/svg";
+
+  function svgEl(name, attrs, text) {
+    var node = document.createElementNS(SVG_NS, name);
+    Object.keys(attrs || {}).forEach(function (k) { node.setAttribute(k, attrs[k]); });
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function weekdayLabel(key) {
+    var p = key.split("-").map(Number);
+    var label = new Date(p[0], p[1] - 1, p[2]).toLocaleDateString("es-AR", { weekday: "short" });
+    return label.replace(".", "");
+  }
+
+  function renderChart(week) {
+    var maxMin = Math.max(5, Math.max.apply(null, week.map(function (d) { return d.seconds / 60; })));
+    var W = 420, H = 190, top = 24, bottom = 30, barW = 38, gap = (W - barW * 7) / 8;
+    var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, "aria-hidden": "true" });
+    var baseY = H - bottom;
+    var usable = baseY - top;
+
+    week.forEach(function (day, i) {
+      var minutes = day.seconds / 60;
+      var h = Math.max(4, (minutes / maxMin) * usable);
+      var x = gap + i * (barW + gap);
+      svg.appendChild(svgEl("rect", {
+        "class": day.seconds > 0 ? "bar" : "bar-empty",
+        x: x.toFixed(1), y: (baseY - h).toFixed(1), width: barW, height: h.toFixed(1), rx: 8
+      }));
+      if (day.seconds > 0) {
+        svg.appendChild(svgEl("text", { "class": "val", x: (x + barW / 2).toFixed(1), y: (baseY - h - 6).toFixed(1) },
+          String(Math.round(minutes * 10) / 10).replace(".", ",")));
+      }
+      svg.appendChild(svgEl("text", { x: (x + barW / 2).toFixed(1), y: H - 8 }, weekdayLabel(day.date)));
+    });
+
+    var chart = $("week-chart");
+    chart.textContent = "";
+    chart.appendChild(svg);
+    var total = week.reduce(function (sum, d) { return sum + d.seconds; }, 0);
+    chart.setAttribute("aria-label", "Minutos practicados en los últimos 7 días: " + Math.round(total / 60) + " en total.");
+  }
+
+  function renderProgress() {
+    var s = R.store.get();
+    var today = R.dateKey(new Date());
+    var week = R.weekSummary(s.history, today);
+    var weekSeconds = week.reduce(function (sum, d) { return sum + d.seconds; }, 0);
+
+    $("p-streak").textContent = String(R.computeStreak(s.history, today));
+    $("p-week").textContent = String(Math.round(weekSeconds / 60));
+    $("p-total").textContent = String(s.history.length);
+    renderChart(week);
+
+    var list = $("recent-list");
+    list.textContent = "";
+    if (s.history.length === 0) {
+      var empty = document.createElement("li");
+      empty.textContent = "Todavía no hiciste ninguna práctica. Cuando termines una, aparece acá.";
+      list.appendChild(empty);
+    }
+    s.history.slice(-8).reverse().forEach(function (e) {
+      var li = document.createElement("li");
+      var what = document.createElement("span");
+      what.textContent = (e.t === "yoga" ? "Yoga en silla" : "Respiración") + " · " + e.n;
+      var when = document.createElement("span");
+      when.className = "when";
+      when.textContent = e.d.split("-").reverse().join("/") + " · " + minutesText(e.s);
+      li.appendChild(what);
+      li.appendChild(when);
+      list.appendChild(li);
+    });
+
+    var clear = $("clear-history");
+    clear.hidden = s.history.length === 0;
+    clear.textContent = "Borrar historial";
+    clear.setAttribute("data-confirm", "no");
+  }
+
+  function onClearHistory() {
+    var btn = $("clear-history");
+    if (btn.getAttribute("data-confirm") !== "yes") {
+      btn.setAttribute("data-confirm", "yes"); // no se usa confirm(): se pide una segunda vez en pantalla
+      btn.textContent = "Tocá de nuevo para borrar todo";
+      return;
+    }
+    R.store.clearHistory();
+    renderProgress();
+    announce("Historial borrado");
+  }
+
+  /* ---------- Arranque ---------- */
+  function init() {
+    figure = new R.Figure($("figure"));
+    aura.static = reduceMotion;
+
+    applySettings();
+    bindSettings();
+    buildBreathChoices();
+    updateCustomVisibility();
+    buildYogaChoices();
+
+    document.querySelectorAll(".view-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () { showView(btn.getAttribute("data-view")); });
+    });
+
+    $("breath-start").addEventListener("click", startBreath);
+    $("breath-pause").addEventListener("click", toggleBreathPause);
+    $("breath-stop").addEventListener("click", stopBreath);
+    $("breath-again").addEventListener("click", function () { resetBreath(); $("breath-start").focus(); });
+
+    $("yoga-start").addEventListener("click", startYoga);
+    $("yoga-pause").addEventListener("click", toggleYogaPause);
+    $("yoga-prev").addEventListener("click", function () { if (yoga) yoga.go(-1); });
+    $("yoga-next").addEventListener("click", function () { if (yoga) yoga.go(1); });
+    $("yoga-stop").addEventListener("click", stopYoga);
+    $("yoga-again").addEventListener("click", function () { resetYoga(); $("yoga-start").focus(); });
+
+    $("clear-history").addEventListener("click", onClearHistory);
+
+    window.addEventListener("resize", function () { aura.resize(); });
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden && wakeLock === null && (breath || yoga)) keepAwake();
+    });
+
+    schedule();
+
+    // Funciona sin internet: registra el service worker cuando la página se sirve por http(s).
+    if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("sw.js").catch(function () {});
+      });
+    }
+  }
+
+  init();
+})(window.Respira = window.Respira || {});
+
+</script>
 </body>
 </html>
